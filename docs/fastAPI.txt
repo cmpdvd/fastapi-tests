@@ -1,0 +1,69 @@
+
+
+fastAPI -----
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+
+python -m pip install --upgrade pip
+echo "*" > .venv/.gitignore
+pip install -r requirements.txt
+
+python main.py
+
+cursor : Command Palette (⇧⌘P) + Python: Select Interpreter
+
+Once you are done working on your project you can deactivate the virtual environment.
+deactivate
+
+run server:
+fastapi dev main.py
+https://fastapi.tiangolo.com/#run-it
+ou bien : uvicorn main:app --reload
+
+--- send to github:
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/cmpdvd/test_fastapi.git
+git push -u origin main
+------
+
+SQLite est plus simple et ne nécessite pas de serveur...
+
+install postgresql:
+brew install postgresql@14
+
+demarre postgresql:
+brew services start postgresql@14
+
+lance le shell postgresql:
+psql postgres
+
+CREATE USER userdc WITH PASSWORD 'passworddc';
+CREATE DATABASE dbdc OWNER userdc;
+GRANT ALL PRIVILEGES ON DATABASE dbdc TO userdc;
+
+quit
+
+---
+install alembic
+pip install -r requirements.txt
+
+
+alembic init alembic
+
+générer un script basé sur tes modèles actuels :
+alembic revision --autogenerate -m "init and create users table"
+
+appliquer migratios :
+alembic upgrade head
+
+-- modifs models.py
+age = Column(Integer, nullable=True)
+
+-- puis : 
+alembic revision --autogenerate -m "add age column to users"
+alembic upgrade head
