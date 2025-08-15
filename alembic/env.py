@@ -32,8 +32,6 @@ print("DEBUG DATABASE_URL =", os.getenv("DATABASE_URL")) # check if DATABASE_URL
 # ------------------------------------------------------------
 database_url = os.getenv('DATABASE_URL')
 
-
-
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
@@ -87,12 +85,6 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
-    # connectable = engine_from_config(
-    #     config.get_section(config.config_ini_section, {}),
-    #     prefix="sqlalchemy.",
-    #     poolclass=pool.NullPool,
-    # )
 
     with connectable.connect() as connection:
         context.configure(
