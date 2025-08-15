@@ -67,3 +67,17 @@ age = Column(Integer, nullable=True)
 -- puis : 
 alembic revision --autogenerate -m "add age column to users"
 alembic upgrade head
+
+
+----
+psql "postgresql://postgres:"
+psql "postgresql://userdc:passworddc@switchyard.proxy.rlwy.net:29966/dbdc"
+
+
+
+ railway connect
+ choose service 
+ ...
+ \q
+
+ 
