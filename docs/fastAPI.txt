@@ -80,4 +80,5 @@ psql "postgresql://userdc:passworddc@switchyard.proxy.rlwy.net:29966/dbdc"
  ...
  \q
 
- 
+run alembic on server: 
+railway run alembic upgrade head

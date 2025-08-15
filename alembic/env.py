@@ -1,7 +1,6 @@
 import sys
 import os
 
-print("DEBUG DATABASE_URL =", os.getenv("DATABASE_URL")) # check if DATABASE_URL is set
 
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
@@ -10,15 +9,11 @@ from database import Base
 from models import *  # for Alembic to see all tables
 
 # ------------------------------------------------------------
-
-
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
-
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,9 +22,13 @@ config = context.config
 # config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
+# This line sets up loggers basically. put print(() ... under this line)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+print("DEBUG DATABASE_URL =", os.getenv("DATABASE_URL")) # check if DATABASE_URL is set
+
+
 
 # add your model's MetaData object here
 # for 'autogenerate' support
