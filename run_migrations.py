@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 print("=== DEBUG DES VARIABLES D'ENVIRONNEMENT ===")
 print(f"DATABASE_URL: {os.getenv('DATABASE_URL')}")
@@ -53,8 +54,5 @@ else:
 
 
 
-# import os
-# import subprocess
-
-# print("Running Alembic migrations...")
-# subprocess.run(["alembic", "upgrade", "head"], check=True)
+print("Running Alembic migrations in run_migration.py...")
+subprocess.run(["alembic", "upgrade", "head"], check=True)
