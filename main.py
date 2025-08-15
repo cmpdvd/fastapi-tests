@@ -13,7 +13,7 @@ app = FastAPI()
 def read_root():
     return {"message": "Hello from Railway & FastAPI David!"}
 
-@app.get("/users/", response_model=list[schemas.UserRead])
+@app.get("/users", response_model=list[schemas.UserRead])
 def read_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 

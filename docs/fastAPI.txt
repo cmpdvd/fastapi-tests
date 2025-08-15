@@ -17,10 +17,15 @@ cursor : Command Palette (⇧⌘P) + Python: Select Interpreter
 Once you are done working on your project you can deactivate the virtual environment.
 deactivate
 
-run server:
+run server locally:
 fastapi dev main.py
 https://fastapi.tiangolo.com/#run-it
-ou bien : uvicorn main:app --reload
+
+
+local, launch server:
+export DATABASE_URL="postgresql://userdc:passworddc@localhost:5432/dbdc"
+uvicorn main:app --reload
+
 
 --- send to github:
 git init
@@ -69,11 +74,7 @@ alembic revision --autogenerate -m "add age column to users"
 alembic upgrade head
 
 
-----
-psql "postgresql://postgres:"
-psql "postgresql://userdc:passworddc@switchyard.proxy.rlwy.net:29966/dbdc"
-
-
+---
 
  railway connect
  choose service 
@@ -83,10 +84,4 @@ psql "postgresql://userdc:passworddc@switchyard.proxy.rlwy.net:29966/dbdc"
 run alembic on server: 
 railway run alembic upgrade head
 
-
-
-# DATABASE_URL = "postgresql://userdc:passworddc@localhost:5432/dbdc"
-# DATABASE_URL = "postgresql://userdc:passworddc@postgres.railway.internal:5432/dbdc" # ok
-# DATABASE_URL = "postgresql://userdc:passworddc@postgres.railway.internal:5432/railway"
-# DATABASE_URL = "postgresql://postgres:splgiJFbXLyOwuWwQeascrFjFDheoJtV@postgres.railway.internal:5432/railway"
 
