@@ -82,3 +82,11 @@ psql "postgresql://userdc:passworddc@switchyard.proxy.rlwy.net:29966/dbdc"
 
 run alembic on server: 
 railway run alembic upgrade head
+
+
+
+# DATABASE_URL = "postgresql://userdc:passworddc@localhost:5432/dbdc"
+# DATABASE_URL = "postgresql://userdc:passworddc@postgres.railway.internal:5432/dbdc" # ok
+# DATABASE_URL = "postgresql://userdc:passworddc@postgres.railway.internal:5432/railway"
+# DATABASE_URL = "postgresql://postgres:splgiJFbXLyOwuWwQeascrFjFDheoJtV@postgres.railway.internal:5432/railway"
+
