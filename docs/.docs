@@ -84,4 +84,6 @@ alembic upgrade head
 run alembic on server: 
 railway run alembic upgrade head
 
+backup database 
+PGPASSWORD=passworddc /opt/homebrew/opt/postgresql@17/bin/pg_dump -h switchyard.proxy.rlwy.net -p 29966 -U userdc -d dbdc -F c -b -v -f postgres_fastapi_backup.dump
 
