@@ -14,4 +14,4 @@ class UserRead(UserBase):
     id: int
 
     class Config:
-        from_attributes = True  # Permet de lire les objets SQLAlchemy
+        from_attributes = True  # allows to read SQLAlchemy objects
