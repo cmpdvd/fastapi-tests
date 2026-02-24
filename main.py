@@ -26,7 +26,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/users", response_model=schemas.UserRead)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    new_user = models.User(name=user.name, email=user.email)
+    new_user = models.User(id=user.id, display_name=user.display_name, email=user.email)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -46,7 +46,7 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
     user_to_update = db.query(models.User).filter(models.User.id == user_id).first()
     if not user_to_update:
         raise HTTPException(status_code=404, detail="User not found")
-    user_to_update.name = user.name
+    user_to_update.display_name = user.display_name
     user_to_update.email = user.email
     db.commit()
     db.refresh(user_to_update)
