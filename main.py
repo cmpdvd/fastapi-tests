@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import desc, asc
 
 from database import Base, engine
 from fastapi import HTTPException
@@ -55,9 +56,25 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
 
 
 # quotes endpoints:
-@app.get("/quotes", response_model=list[schemas.QuoteRead])
-def read_quotes(db: Session = Depends(get_db)):
-    return db.query(models.Quote).all()
+# @app.get("/quotes", response_model=list[schemas.QuoteRead])
+# def read_quotes(db: Session = Depends(get_db)):
+#     return db.query(models.Quote).all()
+
+@app.get("/quotes")
+def get_quotes(
+    limit: int = 10,
+    sort: str = "created_at",
+    order: str = "desc",
+    db: Session = Depends(get_db),
+):
+    query = db.query(models.Quote)
+
+    if order == "desc":
+        query = query.order_by(desc(getattr(models.Quote, sort)))
+    else:
+        query = query.order_by(asc(getattr(models.Quote, sort)))
+
+    return query.limit(limit).all()
 
 @app.get("/quotes/{quote_id}", response_model=schemas.QuoteRead)
 def read_quote(quote_id: int, db: Session = Depends(get_db)):
