@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from uuid import UUID
 
 class UserBase(BaseModel):
-    name: str
-    email: str
+    display_name: str | None
+    email: str | None
 
 class UserCreate(UserBase):
     pass
