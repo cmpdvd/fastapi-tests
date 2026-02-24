@@ -7,10 +7,10 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     display_name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-class Customer(Base):
-    __tablename__ = "customers"
+class Anecdote(Base):
+    __tablename__ = "anecdotes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    email = Column(String, unique=True, index=True)
+    quote = Column(String, index=True)
+    child_name = Column(String, unique=True, index=True)
 
