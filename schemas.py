@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from uuid import UUID
 
 class UserBase(BaseModel):
     name: str
@@ -11,7 +12,9 @@ class UserUpdate(UserBase):
     pass
 
 class UserRead(UserBase):
-    id: int
+    id: UUID
+    display_name: str | None
+    email: str | None
 
     class Config:
         from_attributes = True  # allows to read SQLAlchemy objects
