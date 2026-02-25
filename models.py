@@ -1,6 +1,6 @@
-from database import Base
-from sqlalchemy.dialects.postgresql import TIMESTAMP
-from sqlalchemy import Column, BigInteger, String, DateTime, func
+# from database import Base
+# from sqlalchemy.dialects.postgresql import TIMESTAMP
+# from sqlalchemy import Column, BigInteger, String, DateTime, func
 
 
 # class User(Base):
