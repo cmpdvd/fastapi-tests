@@ -1,32 +1,3 @@
-# from database import Base
-# from sqlalchemy.dialects.postgresql import TIMESTAMP
-# from sqlalchemy import Column, BigInteger, String, DateTime, func
-
-
-# class User(Base):
-#     __tablename__ = "users"
-#     id = Column(BigInteger, primary_key=True, autoincrement=True)
-#     display_name = Column(String, index=True)
-#     email = Column(String, unique=True, index=True)
-#     created_at = Column(
-#         TIMESTAMP(timezone=True),
-#         server_default=func.now(),
-#         nullable=False,
-#     )
-
-
-# class Quote(Base):
-#     __tablename__ = "quotes"
-#     id = Column(BigInteger, primary_key=True, autoincrement=True)
-#     quote = Column(String, index=True)
-#     child_name = Column(String, index=True)
-#     created_at = Column(
-#         TIMESTAMP(timezone=True),
-#         server_default=func.now(),
-#         nullable=False,
-#     )
-
-
 # -----
 # =============================================================================
 # BABILLAGES — SQLAlchemy Models
@@ -144,7 +115,6 @@ class NotificationTypeEnum(str, enum.Enum):
     new_top_monthly = "new_top_monthly"
     system          = "system"
 
-
 # =============================================================================
 # TABLE : users
 # Utilisateurs ayant créé un compte (Apple/Google Sign-In)
@@ -230,25 +200,26 @@ class User(Base):
     )
     
     iap_purchases: Mapped[list["IapPurchase"]] = relationship(
-    "IapPurchase",
-    back_populates="user"
-)
+        "IapPurchase",
+        back_populates="user"
+    )
 
-pdf_booklets: Mapped[list["PdfBooklet"]] = relationship(
-    "PdfBooklet",
-    back_populates="user"
-)
+    pdf_booklets: Mapped[list["PdfBooklet"]] = relationship(
+        "PdfBooklet",
+        back_populates="user"
+    )
 
-notifications: Mapped[list["Notification"]] = relationship(
-    "Notification",
-    back_populates="user"
-)
+    notifications: Mapped[list["Notification"]] = relationship(
+        "Notification",
+        back_populates="user"
+    )
 
-ai_moderation_logs: Mapped[list["AiModerationLog"]] = relationship(
-    "AiModerationLog",
-    back_populates="override_user",
-    foreign_keys="AiModerationLog.override_by"
-)
+    ai_moderation_logs: List["AiModerationLog"] = relationship(
+        "AiModerationLog",
+        back_populates="override_user",
+        foreign_keys="[AiModerationLog.override_by]"
+    )
+
 
 # =============================================================================
 # TABLE : devices
@@ -543,10 +514,11 @@ class AiModerationLog(Base):
         "Quote",
         back_populates="ai_logs"
     )
-    override_user: Mapped[Optional["User"]] = relationship(
+
+    override_user: Optional["User"] = relationship(
         "User",
         back_populates="ai_moderation_logs",
-        foreign_keys=[override_by]
+        foreign_keys="[AiModerationLog.override_by]"
     )
 
 

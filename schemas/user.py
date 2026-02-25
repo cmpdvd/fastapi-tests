@@ -18,6 +18,5 @@ class UserRead(UserBase):
     id: int
     display_name: str | None
     email: str | None
-
     class Config:
         from_attributes = True  # allows to read SQLAlchemy objects
