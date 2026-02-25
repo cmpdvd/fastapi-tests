@@ -39,7 +39,7 @@ from sqlalchemy.sql import func
 # =============================================================================
 
 class Base(DeclarativeBase):
-    pass
+    __allow_unmapped__ = True #  remove for production + fix foreignkeys 
 
 
 # =============================================================================
