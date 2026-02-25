@@ -28,7 +28,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/users", response_model=schemas.UserRead)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    new_user = models.User(id=user.id, display_name=user.display_name, email=user.email)
+    new_user = models.User(display_name=user.display_name, email=user.email)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -85,7 +85,7 @@ def read_quote(quote_id: int, db: Session = Depends(get_db)):
 
 @app.post("/quotes", response_model=schemas.QuoteRead)
 def create_quote(quote: schemas.QuoteCreate, db: Session = Depends(get_db)):
-    new_quote = models.Quote(id=quote.id, quote=quote.quote, child_name=quote.child_name)
+    new_quote = models.Quote(quote=quote.quote, child_name=quote.child_name)
     db.add(new_quote)
     db.commit()
     db.refresh(new_quote)
