@@ -59,7 +59,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TIMESTAMP
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
 from sqlalchemy.sql import func
 
 
@@ -205,15 +205,50 @@ class User(Base):
     )
 
     # Relationships
-    devices            : List["Device"]           = relationship("Device",          back_populates="user",     foreign_keys="Device.user_id")
-    quotes             : List["Quote"]            = relationship("Quote",           back_populates="user",     foreign_keys="Quote.user_id")
-    votes              : List["Vote"]             = relationship("Vote",            back_populates="user")
-    reports_filed      : List["Report"]           = relationship("Report",          back_populates="user",     foreign_keys="Report.user_id")
-    iap_purchases      : List["IapPurchase"]      = relationship("IapPurchase",     back_populates="user")
-    pdf_booklets       : List["PdfBooklet"]       = relationship("PdfBooklet",      back_populates="user")
-    notifications      : List["Notification"]     = relationship("Notification",    back_populates="user")
-    ai_moderation_logs : List["AiModerationLog"]  = relationship("AiModerationLog", back_populates="override_user", foreign_keys="AiModerationLog.override_by")
 
+    devices: Mapped[list["Device"]] = relationship(  # type: ignore
+        "Device",
+        back_populates="user",
+        foreign_keys="Device.user_id"
+    )
+
+    quotes: Mapped[list["Quote"]] = relationship(
+        "Quote",
+        back_populates="user",
+        foreign_keys="Quote.user_id"
+    )
+
+    votes: Mapped[list["Vote"]] = relationship(
+        "Vote",
+        back_populates="user"
+    )
+
+    reports_filed: Mapped[list["Report"]] = relationship(
+        "Report",
+        back_populates="user",
+        foreign_keys="Report.user_id"
+    )
+    
+    iap_purchases: Mapped[list["IapPurchase"]] = relationship(
+    "IapPurchase",
+    back_populates="user"
+)
+
+pdf_booklets: Mapped[list["PdfBooklet"]] = relationship(
+    "PdfBooklet",
+    back_populates="user"
+)
+
+notifications: Mapped[list["Notification"]] = relationship(
+    "Notification",
+    back_populates="user"
+)
+
+ai_moderation_logs: Mapped[list["AiModerationLog"]] = relationship(
+    "AiModerationLog",
+    back_populates="override_user",
+    foreign_keys="AiModerationLog.override_by"
+)
 
 # =============================================================================
 # TABLE : devices
@@ -233,10 +268,29 @@ class Device(Base):
     last_seen_at       = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
-    user             : Optional["User"]            = relationship("User",    back_populates="devices", foreign_keys=[user_id])
-    quotes           : List["Quote"]               = relationship("Quote",   back_populates="device",  foreign_keys="Quote.device_id")
-    reports          : List["Report"]              = relationship("Report",  back_populates="device",  foreign_keys="Report.device_id")
-    analytics_events : List["AnalyticsEvent"]      = relationship("AnalyticsEvent", back_populates="device")
+
+    user: Mapped[Optional["User"]] = relationship(
+        "User",
+        back_populates="devices",
+        foreign_keys=[user_id]
+    )
+
+    quotes: Mapped[list["Quote"]] = relationship(
+        "Quote",
+        back_populates="device",
+        foreign_keys="Quote.device_id"
+    )
+    reports: Mapped[list["Report"]] = relationship(
+        "Report",
+        back_populates="device",
+        foreign_keys="Report.device_id"
+    )
+
+    analytics_events: Mapped[list["AnalyticsEvent"]] = relationship(
+        "AnalyticsEvent",
+        back_populates="device"
+    )
+
 
 
 # =============================================================================
@@ -300,14 +354,50 @@ class Quote(Base):
     )
 
     # Relationships
-    user             : Optional["User"]              = relationship("User",   back_populates="quotes",    foreign_keys=[user_id])
-    device           : Optional["Device"]            = relationship("Device", back_populates="quotes",    foreign_keys=[device_id])
-    moderator        : Optional["User"]              = relationship("User",                               foreign_keys=[moderated_by])
-    votes            : List["Vote"]                  = relationship("Vote",            back_populates="quote", cascade="all, delete-orphan")
-    reports          : List["Report"]                = relationship("Report",          back_populates="quote", cascade="all, delete-orphan")
-    ai_logs          : List["AiModerationLog"]       = relationship("AiModerationLog", back_populates="quote", cascade="all, delete-orphan")
-    monthly_rankings : List["MonthlyRanking"]        = relationship("MonthlyRanking",  back_populates="quote")
-    analytics_events : List["AnalyticsEvent"]        = relationship("AnalyticsEvent",  back_populates="quote")
+    user: Mapped[Optional["User"]] = relationship(
+        "User",
+        back_populates="quotes",
+        foreign_keys=[user_id]
+    )
+
+    device: Mapped[Optional["Device"]] = relationship(
+        "Device",
+        back_populates="quotes",
+        foreign_keys=[device_id]
+    )
+
+    moderator: Mapped[Optional["User"]] = relationship(
+        "User",
+        foreign_keys=[moderated_by]
+    )
+
+    votes: Mapped[list["Vote"]] = relationship(
+        "Vote",
+        back_populates="quote",
+        cascade="all, delete-orphan"
+    )
+
+    reports: Mapped[list["Report"]] = relationship(
+        "Report",
+        back_populates="quote",
+        cascade="all, delete-orphan"
+    )
+
+    ai_logs: Mapped[list["AiModerationLog"]] = relationship(
+        "AiModerationLog",
+        back_populates="quote",
+        cascade="all, delete-orphan"
+    )
+
+    monthly_rankings: Mapped[list["MonthlyRanking"]] = relationship(
+        "MonthlyRanking",
+        back_populates="quote"
+    )
+
+analytics_events: Mapped[list["AnalyticsEvent"]] = relationship(
+    "AnalyticsEvent",
+    back_populates="quote"
+)
 
 
 # =============================================================================
@@ -329,8 +419,14 @@ class Vote(Base):
     )
 
     # Relationships
-    quote : "Quote" = relationship("Quote", back_populates="votes")
-    user  : "User"  = relationship("User",  back_populates="votes")
+    quote: Mapped["Quote"] = relationship(
+        "Quote",
+        back_populates="votes"
+    )
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="votes"
+    )
 
 
 # =============================================================================
@@ -354,7 +450,10 @@ class MonthlyRanking(Base):
     )
 
     # Relationships
-    quote : "Quote" = relationship("Quote", back_populates="monthly_rankings")
+    quote: Mapped["Quote"] = relationship(
+        "Quote",
+        back_populates="monthly_rankings"
+    )
 
 
 # =============================================================================
@@ -386,10 +485,21 @@ class Report(Base):
     )
 
     # Relationships
-    quote    : "Quote"          = relationship("Quote",  back_populates="reports", foreign_keys=[quote_id])
-    user     : Optional["User"] = relationship("User",   back_populates="reports_filed", foreign_keys=[user_id])
-    device   : Optional["Device"] = relationship("Device", back_populates="reports", foreign_keys=[device_id])
-    reviewer : Optional["User"] = relationship("User",   foreign_keys=[reviewed_by])
+    quote: Mapped["Quote"] = relationship(
+        "Quote",
+        back_populates="reports",
+        foreign_keys=[quote_id]
+    )
+    user: Mapped[Optional["User"]] = relationship(
+        "User",
+        back_populates="reports_filed",
+        foreign_keys=[user_id]
+    )
+    device: Mapped[Optional["Device"]] = relationship(
+        "Device",
+        back_populates="reports",
+        foreign_keys=[device_id]
+    )
 
 
 # =============================================================================
@@ -429,8 +539,15 @@ class AiModerationLog(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
-    quote         : "Quote"         = relationship("Quote", back_populates="ai_logs")
-    override_user : Optional["User"] = relationship("User",  back_populates="ai_moderation_logs", foreign_keys=[override_by])
+    quote: Mapped["Quote"] = relationship(
+        "Quote",
+        back_populates="ai_logs"
+    )
+    override_user: Mapped[Optional["User"]] = relationship(
+        "User",
+        back_populates="ai_moderation_logs",
+        foreign_keys=[override_by]
+    )
 
 
 # =============================================================================
@@ -477,9 +594,15 @@ class IapPurchase(Base):
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
-    user         : "User"              = relationship("User",       back_populates="iap_purchases")
-    pdf_booklets : List["PdfBooklet"]  = relationship("PdfBooklet", back_populates="purchase")
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="iap_purchases"
+    )
 
+    pdf_booklets: Mapped[list["PdfBooklet"]] = relationship(
+        "PdfBooklet",
+        back_populates="purchase"
+    )
 
 # =============================================================================
 # TABLE : pdf_booklets
@@ -513,8 +636,15 @@ class PdfBooklet(Base):
     generated_at = Column(TIMESTAMP(timezone=True), nullable=True)
 
     # Relationships
-    user     : "User"              = relationship("User",        back_populates="pdf_booklets")
-    purchase : Optional["IapPurchase"] = relationship("IapPurchase", back_populates="pdf_booklets")
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="pdf_booklets"
+    )
+
+    purchase: Mapped[Optional["IapPurchase"]] = relationship(
+        "IapPurchase",
+        back_populates="pdf_booklets"
+    )
 
 
 # =============================================================================
@@ -543,7 +673,10 @@ class Notification(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
-    user : "User" = relationship("User", back_populates="notifications")
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="notifications"
+    )
 
 
 # =============================================================================
@@ -578,7 +711,20 @@ class AnalyticsEvent(Base):
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, index=True)
 
     # Relationships
-    user   : Optional["User"]   = relationship("User",   back_populates=None, foreign_keys=[user_id])
-    device : Optional["Device"] = relationship("Device", back_populates="analytics_events", foreign_keys=[device_id])
-    quote  : Optional["Quote"]  = relationship("Quote",  back_populates="analytics_events", foreign_keys=[quote_id])
+    user: Mapped[Optional["User"]] = relationship(
+        "User",
+        back_populates=None,
+        foreign_keys=[user_id]
+    )
 
+    device: Mapped[Optional["Device"]] = relationship(
+        "Device",
+        back_populates="analytics_events",
+        foreign_keys=[device_id]
+    )
+
+    quote: Mapped[Optional["Quote"]] = relationship(
+        "Quote",
+        back_populates="analytics_events",
+        foreign_keys=[quote_id]
+    )
