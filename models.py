@@ -365,10 +365,10 @@ class Quote(Base):
         back_populates="quote"
     )
 
-analytics_events: Mapped[list["AnalyticsEvent"]] = relationship(
-    "AnalyticsEvent",
-    back_populates="quote"
-)
+    analytics_events: Mapped[list["AnalyticsEvent"]] = relationship(
+        "AnalyticsEvent",
+        back_populates="quote"
+    )
 
 
 # =============================================================================
