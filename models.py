@@ -31,7 +31,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, TIMESTAMP
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, text
 
 
 # =============================================================================
@@ -229,7 +229,7 @@ class User(Base):
 class Device(Base):
     __tablename__ = "devices"
 
-    id                 = Column(BigInteger, primary_key=True, autoincrement=True)
+    id                 = Column(Text, primary_key=True)
     device_fingerprint = Column(Text, nullable=False, unique=True)   # Hash anonymisé de l'appareil
     user_id            = Column(BigInteger, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     locale             = Column(Text, server_default="fr", nullable=False)
@@ -262,6 +262,11 @@ class Device(Base):
         back_populates="device"
     )
 
+    votes: Mapped[list["Vote"]] = relationship(
+        "Vote",
+        back_populates="device",
+        foreign_keys="Vote.device_id"
+    )
 
 
 # =============================================================================
@@ -276,7 +281,7 @@ class Quote(Base):
 
     # Auteur (l'un ou l'autre doit être non-null — vérifié par constraint SQL)
     user_id   = Column(BigInteger, ForeignKey("users.id",   ondelete="SET NULL"), nullable=True)
-    device_id = Column(BigInteger, ForeignKey("devices.id", ondelete="SET NULL"), nullable=True)
+    device_id = Column(Text, ForeignKey("devices.id", ondelete="SET NULL"), nullable=True)
 
     # Contenu
     child_name       = Column(Text,         nullable=False)          # Prénom ou surnom
@@ -381,12 +386,15 @@ class Vote(Base):
 
     id          = Column(BigInteger, primary_key=True, autoincrement=True)
     quote_id    = Column(BigInteger, ForeignKey("quotes.id", ondelete="CASCADE"),  nullable=False)
-    user_id     = Column(BigInteger, ForeignKey("users.id",  ondelete="CASCADE"),  nullable=False)
+    user_id     = Column(BigInteger, ForeignKey("users.id",  ondelete="CASCADE"),  nullable=True)   # connecté
+    device_id   = Column(Text,       ForeignKey("devices.id", ondelete="CASCADE"), nullable=True)   # non connecté
     vote_period = Column(Text, nullable=False)                       # Format : 'YYYY-MM'
     created_at  = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("quote_id", "user_id", name="votes_unique_user"),
+        CheckConstraint("(user_id IS NOT NULL) <> (device_id IS NOT NULL)", name="votes_user_or_device"),
+        Index("votes_unique_user", "quote_id", "user_id", unique=True, postgresql_where=text("user_id IS NOT NULL")),
+        Index("votes_unique_device", "quote_id", "device_id", unique=True, postgresql_where=text("device_id IS NOT NULL")),
     )
 
     # Relationships
@@ -394,9 +402,15 @@ class Vote(Base):
         "Quote",
         back_populates="votes"
     )
-    user: Mapped["User"] = relationship(
+    user: Mapped[Optional["User"]] = relationship(
         "User",
-        back_populates="votes"
+        back_populates="votes",
+        foreign_keys=[user_id]
+    )
+    device: Mapped[Optional["Device"]] = relationship(
+        "Device",
+        back_populates="votes",
+        foreign_keys=[device_id]
     )
 
 
@@ -438,7 +452,7 @@ class Report(Base):
     id          = Column(BigInteger, primary_key=True, autoincrement=True)
     quote_id    = Column(BigInteger, ForeignKey("quotes.id",   ondelete="CASCADE"),  nullable=False)
     user_id     = Column(BigInteger, ForeignKey("users.id",    ondelete="SET NULL"), nullable=True)
-    device_id   = Column(BigInteger, ForeignKey("devices.id",  ondelete="SET NULL"), nullable=True)
+    device_id   = Column(Text, ForeignKey("devices.id",  ondelete="SET NULL"), nullable=True)
 
     reason       = Column(String, nullable=False)
     details      = Column(Text,   nullable=True)
@@ -677,7 +691,7 @@ class AnalyticsEvent(Base):
     id         = Column(BigInteger, primary_key=True, autoincrement=True)
     event_name = Column(Text, nullable=False, index=True)           # 'quote_viewed', 'vote_cast', etc.
     user_id    = Column(BigInteger, ForeignKey("users.id",    ondelete="SET NULL"), nullable=True)
-    device_id  = Column(BigInteger, ForeignKey("devices.id",  ondelete="SET NULL"), nullable=True)
+    device_id  = Column(Text, ForeignKey("devices.id",  ondelete="SET NULL"), nullable=True)
     quote_id   = Column(BigInteger, ForeignKey("quotes.id",   ondelete="SET NULL"), nullable=True)
     properties = Column(JSONB, nullable=True)                       # Propriétés custom de l'événement
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, index=True)

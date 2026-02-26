@@ -60,11 +60,13 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
 # def read_quotes(db: Session = Depends(get_db)):
 #     return db.query(models.Quote).all()
 
-@app.get("/quotes")
+@app.get("/quotes", response_model=list[schemas.QuoteWithVoteRead])
 def get_quotes(
     limit: int = 10,
     sort: str = "created_at",
     order: str = "desc",
+    user_id: int | None = None,
+    device_id: str | None = None,
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Quote)
@@ -74,7 +76,27 @@ def get_quotes(
     else:
         query = query.order_by(asc(getattr(models.Quote, sort)))
 
-    return query.limit(limit).all()
+    quotes = query.limit(limit).all()
+    quote_ids = [q.id for q in quotes]
+
+    voted_quote_ids: set[int] = set()
+    if quote_ids:
+        vote_query = db.query(models.Vote.quote_id)
+        if user_id is not None:
+            vote_query = vote_query.filter(models.Vote.user_id == user_id)
+        elif device_id is not None:
+            vote_query = vote_query.filter(models.Vote.device_id == device_id)
+        voted_quote_ids = {row[0] for row in vote_query.filter(models.Vote.quote_id.in_(quote_ids)).all()}
+
+    return [
+        schemas.QuoteWithVoteRead(
+            id=q.id,
+            quote=q.quote,
+            child_name=q.child_name,
+            user_has_voted=q.id in voted_quote_ids,
+        )
+        for q in quotes
+    ]
 
 @app.get("/quotes/{quote_id}", response_model=schemas.QuoteRead)
 def read_quote(quote_id: int, db: Session = Depends(get_db)):
@@ -90,3 +112,18 @@ def create_quote(quote: schemas.QuoteCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_quote)
     return new_quote
+
+
+#  votes endpoints:
+@app.post("/votes", response_model=schemas.VoteRead)
+def create_vote(vote: schemas.VoteCreate, db: Session = Depends(get_db)):
+    new_vote = models.Vote(
+        quote_id=vote.quote_id,
+        user_id=vote.user_id,
+        device_id=vote.device_id,
+        vote_period=vote.vote_period,
+    )
+    db.add(new_vote)
+    db.commit()
+    db.refresh(new_vote)
+    return new_vote

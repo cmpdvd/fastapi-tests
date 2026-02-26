@@ -18,3 +18,7 @@ class QuoteRead(QuoteBase):
     id: int
     quote: str | None
     child_name: str | None
+
+
+class QuoteWithVoteRead(QuoteRead):
+    user_has_voted: bool

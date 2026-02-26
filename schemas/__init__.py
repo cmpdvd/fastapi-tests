@@ -1,5 +1,5 @@
 from schemas.user import UserBase, UserCreate, UserUpdate, UserRead
-from schemas.quote import QuoteBase, QuoteCreate, QuoteUpdate, QuoteRead
+from schemas.quote import QuoteBase, QuoteCreate, QuoteUpdate, QuoteRead, QuoteWithVoteRead
 
 __all__ = [
     "UserBase",
@@ -10,4 +10,5 @@ __all__ = [
     "QuoteCreate",
     "QuoteUpdate",
     "QuoteRead",
+    "QuoteWithVoteRead",
 ]
