@@ -75,10 +75,11 @@ def get_quotes(
         query = query.order_by(desc(getattr(models.Quote, sort)))
     else:
         query = query.order_by(asc(getattr(models.Quote, sort)))
-
+    print('user_id', user_id)
     quotes = query.limit(limit).all()
     quote_ids = [q.id for q in quotes]
 
+    print('quote_ids', quote_ids)
     voted_quote_ids: set[int] = set()
     if quote_ids:
         vote_query = db.query(models.Vote.quote_id)
@@ -87,7 +88,8 @@ def get_quotes(
         elif device_id is not None:
             vote_query = vote_query.filter(models.Vote.device_id == device_id)
         voted_quote_ids = {row[0] for row in vote_query.filter(models.Vote.quote_id.in_(quote_ids)).all()}
-
+    
+    print('voted_quote_ids', voted_quote_ids)
     return [
         schemas.QuoteWithVoteRead(
             id=q.id,
