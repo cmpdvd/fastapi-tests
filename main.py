@@ -62,7 +62,7 @@ def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(ge
 
 @app.get("/quotes", response_model=list[schemas.QuoteWithVoteRead])
 def get_quotes(
-    limit: int = 10,
+    limit: int = 100,
     sort: str = "created_at",
     order: str = "desc",
     user_id: int | None = None,
@@ -87,6 +87,8 @@ def get_quotes(
             vote_query = vote_query.filter(models.Vote.user_id == user_id)
         elif device_id is not None:
             vote_query = vote_query.filter(models.Vote.device_id == device_id)
+        print('vote_query', vote_query)
+        # voted_quote_ids = {row[0] for row in vote_query.filter(models.Vote.quote_id.in_(quote_ids)).all()}
         voted_quote_ids = {row[0] for row in vote_query.filter(models.Vote.quote_id.in_(quote_ids)).all()}
     
     print('voted_quote_ids', voted_quote_ids)
