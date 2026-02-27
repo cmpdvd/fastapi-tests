@@ -12,7 +12,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from Railway & FastAPI David!"}
+    return {"message": "Hello from Railway & FastAPI!"}
 
 # users endpoints:
 @app.get("/users", response_model=list[schemas.UserRead])
