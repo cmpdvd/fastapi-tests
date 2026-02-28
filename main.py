@@ -2,11 +2,15 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 
-from database import Base, engine
+from .database import Base, engine
+
 from fastapi import HTTPException
-import schemas
-import models
-from deps import get_db
+from app.fastApi import schemas
+
+from app.fastApi import models
+from .deps import get_db
+from datetime import datetime, timedelta, timezone
+
 
 app = FastAPI()
 
@@ -67,18 +71,23 @@ def get_quotes(
     order: str = "desc",
     user_id: int | None = None,
     device_id: str | None = None,
+    vote_period: str | None = None,
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Quote)
 
+   # date limite = maintenant - 30 jours
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=30)
+    query = query.filter(models.Quote.created_at >= cutoff_date)
+    
     if order == "desc":
         query = query.order_by(desc(getattr(models.Quote, sort)))
     else:
         query = query.order_by(asc(getattr(models.Quote, sort)))
-    print('user_id', user_id)
     quotes = query.limit(limit).all()
     quote_ids = [q.id for q in quotes]
 
+    print('user_id', user_id)
     print('quotes', quotes)
     print('quote_ids', quote_ids)
     voted_quote_ids: set[int] = set()
