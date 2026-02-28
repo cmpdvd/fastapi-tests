@@ -1,0 +1,39 @@
+
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: userdc
+      POSTGRES_PASSWORD: passworddc
+      POSTGRES_DB: dbdc
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    env_file:
+      - .env.local
+      # - .env.prod
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app   # hot reload local
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    command: uvicorn app.fastApi.main:app --host 0.0.0.0 --port 8000 --reload
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@test.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+volumes:
+  postgres_data:

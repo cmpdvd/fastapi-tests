@@ -1,5 +1,4 @@
-.env
-.docs
-.dump
+.env.local
+.env.prod
 
 
