@@ -8,7 +8,8 @@ env | grep -i -E "(database|postgres|pg|db)" | head -10
 
 
 echo "Starting web server..."
-python -m uvicorn app.fastApi.main:app --host 0.0.0.0 --port 8000
+# python -m uvicorn app.fastApi.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn app.fastApi.main:app --host 0.0.0.0 --port ${PORT:-8000}
 
 
 
